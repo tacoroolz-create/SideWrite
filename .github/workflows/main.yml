@@ -21,8 +21,15 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      # GitHub's Ubuntu runners already ship with the Android SDK base at
+      # $ANDROID_HOME; we just grant licenses and add the exact components
+      # the project needs (this replaces the flaky setup-android action).
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "platforms;android-34" "build-tools;34.0.0" "platform-tools" \
+            >/dev/null
 
       # Installs the Gradle version pinned in gradle-wrapper.properties —
       # no wrapper jar or local Gradle install required.
